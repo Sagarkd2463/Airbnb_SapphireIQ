@@ -22,12 +22,22 @@ const bookingSchema = new mongoose.Schema(
     checkOut: {
       type: Date,
       required: true,
+      validate: {
+        validator: function (value) {
+          return value > this.checkIn;
+        },
+        message: "Check-out must be after check-in",
+      },
     },
 
     guests: {
       type: Number,
       required: true,
       min: 1,
+      validate: {
+        validator: Number.isInteger,
+        message: "Guest count must be a whole number",
+      },
     },
 
     totalPrice: {
@@ -53,12 +63,14 @@ const bookingSchema = new mongoose.Schema(
   },
 );
 
+// Find bookings for a listing
 bookingSchema.index({
   listing: 1,
   checkIn: 1,
   checkOut: 1,
 });
 
+// Find guest booking history
 bookingSchema.index({
   guest: 1,
   createdAt: -1,

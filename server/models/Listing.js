@@ -11,6 +11,7 @@ const listingSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
+      trim: true,
     },
 
     propertyType: {
@@ -29,25 +30,32 @@ const listingSchema = new mongoose.Schema(
       address: {
         type: String,
         required: true,
+        trim: true,
       },
 
       city: {
         type: String,
         required: true,
+        trim: true,
       },
 
       country: {
         type: String,
         required: true,
+        trim: true,
       },
 
       coordinates: {
         latitude: {
           type: Number,
+          min: -90,
+          max: 90,
         },
 
         longitude: {
           type: Number,
+          min: -180,
+          max: 180,
         },
       },
     },
@@ -66,6 +74,10 @@ const listingSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 1,
+      validate: {
+        validator: Number.isInteger,
+        message: "Maximum guests must be a whole number",
+      },
     },
 
     bedrooms: {
@@ -100,6 +112,22 @@ const listingSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+// Search listings by city
+listingSchema.index({
+  "location.city": 1,
+});
+
+// Search listings by price
+listingSchema.index({
+  pricePerNight: 1,
+});
+
+// Find listings by host
+listingSchema.index({
+  host: 1,
+  createdAt: -1,
+});
 
 const Listing = mongoose.model("Listing", listingSchema);
 
